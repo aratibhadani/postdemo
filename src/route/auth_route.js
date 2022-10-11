@@ -13,6 +13,7 @@ router.post("/registration",userRegistration);
 router.post("/login", loginUser);
 
 router.get("",loginCheck,listUser);
+
 router.get("/logout",loginCheck,logout);
 
 module.exports=router;

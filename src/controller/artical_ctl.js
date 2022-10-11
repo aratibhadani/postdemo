@@ -30,7 +30,7 @@ module.exports = {
                         });
                     } else {
                         const { name, content } = req.body;
-
+                        console.log(req.files)
                         const loginUserId = await returnDecodedToken(req);
                         //store artical data
                         const articalData = await articalSchema.create({
@@ -41,6 +41,7 @@ module.exports = {
                         await t1.commit(); //1st to commit transaction than after generate new
 
                         //store artical image data
+                       
                         const articalImageArr = await req.files.map(item => {
                             return { image: item.filename, articalId: articalData.id }
                         })

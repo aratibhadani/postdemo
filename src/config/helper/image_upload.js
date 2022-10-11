@@ -18,18 +18,14 @@ var storage = multer.diskStorage({
 })
 var upload = multer({
   storage: storage,
-  limits: {
-    fileSize: 5000000 // 1000000 Bytes = 1 MB
-  },
   fileFilter(req, file, cb) {
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+    console.log(file)
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "video/quicktime"|| file.mimetype == "video/mp4") {
       cb(null, true);
     } else {
       return cb(new Error('Invalid file upload type:(png, jpeg ,jpg)'));
     }
   }
 });
-const uploadSingleImage = upload.single('image');
 const uploadmultipleImage = upload.array('files', 5);
-// const uploadFiles = upload.array("images", 10); // limit to 10 images
-module.exports = { uploadSingleImage, uploadmultipleImage };
+module.exports = { uploadmultipleImage };
