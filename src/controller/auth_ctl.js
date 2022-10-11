@@ -1,10 +1,10 @@
 const userSchema = require("../model/user_model");
 const bcrypt = require('bcrypt');
-const { checkUserExistOrNot, generateLoginToken,  } = require("../config/helper/helper_func");
+const { checkUserExistOrNot, generateLoginToken, returnDecodedToken,  } = require("../config/helper/helper_func");
 const sequelize = require("../config/db_conn");
 const { Op } = require("sequelize");
 const { createUserValidation, loginValidation } = require("../config/helper/input_validation");
-const saltRounds = 10;
+
 
 module.exports = {
     userRegistration: async (req, res) => {
@@ -12,8 +12,6 @@ module.exports = {
         const t = await sequelize.transaction();
         try {
             if (response.error) {
-            console.log(response.error)
-
                 res.status(400).json({
                     message: `${response.error.details[0].message}`
                 });
@@ -21,14 +19,11 @@ module.exports = {
                 const { name, email, contactno, password} = req.body;
                 //check email exists or not
                 const checkEmail = await checkUserExistOrNot(email, t);
-
                 if (checkEmail) {
                     return res.status(409).json({
                         message: "Email already exists"
                     })
                 } else {
-
-                    // const hashPass = await bcrypt.hash(password, saltRounds);
                     const user = await userSchema.create({ name, email, contactno, password:password }
                         , { transaction: t }
                     );
@@ -144,14 +139,13 @@ module.exports = {
     logout: async (req, res) => {
         const t = await sequelize.transaction();
         try {
-            const userId = await checkToken(req);
+            const userData = await returnDecodedToken(req);
             const data = await userSchema.update({
                 loginToken: ""
-            }, { where: { id: userId } });
+            }, { where: { id: userData.id ,email:userData.email} });
+            console.log(data)
             if (data[0] == 1) {
-               
-
-                res.status(200).json({ message: "logout successfully" })
+               res.status(200).json({ message: "logout successfully" })
             }
             await t.commit();
         } catch (err) {

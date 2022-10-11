@@ -25,14 +25,13 @@ const userSchema = sequelize.define("user", {
   hooks: {
     beforeCreate: async (user) => {
       if (user.password) {
-        const salt = await bcrypt.genSaltSync(10, 'a');
+        const salt = await bcrypt.genSaltSync(saltRounds);
         user.password = bcrypt.hashSync(user.password, salt);
       }
-      console.log(user,'userdatajhkjhjk->',user.password)
     },
     // beforeUpdate: async (user) => {
     //   if (user.password) {
-    //     const salt = await bcrypt.genSaltSync(10, 'a');
+    //     const salt = await bcrypt.genSaltSync(saltRounds);
     //     user.password = bcrypt.hashSync(user.password, salt);
     //   }
     // }
@@ -42,8 +41,6 @@ const userSchema = sequelize.define("user", {
   //     return bcrypt.compareSync(password, this.password);
   //   }
   // }
-},
-{
   tableName: 'user'
 });
 

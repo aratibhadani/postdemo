@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const userSchema = require("../../model/user_model");
 var jwt = require('jsonwebtoken');
+const postSchema = require('../../model/post_model');
+const articalSchema = require('../../model/artical_model');
 
 module.exports={
     checkUserExistOrNot:async(email,t)=>{
@@ -23,4 +25,18 @@ module.exports={
                  loginToken: token, 
              } })
      },
+     returnDecodedToken:async(req)=>{
+        const token = req.headers.authorization.split(' ')[1];
+        return await jwt.verify(token, process.env.LOGIN_SECRET_KEY);
+    },
+    checkPostExist:async(postId)=>{
+        return postSchema.findOne({
+            where:{id:postId}
+        })
+    },
+    checkArticalExist:async(articalId)=>{
+        return articalSchema.findOne({
+            where:{id:articalId}
+        })
+    }
 }

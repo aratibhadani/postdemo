@@ -36,4 +36,16 @@ function loginValidation(data) {
     }).options({ abortEarly: true });
     return schema.validate(data)
 }
-module.exports = { createUserValidation, loginValidation}
+//check validation in post or artical field
+function postArticalInputValidation(data) {
+    const schema = Joi.object({
+        name: Joi.string().required().messages({
+            "string.empty": "User name is required!!",
+        }),
+        content: Joi.string().required().messages({
+            "string.empty": "User name is required!!",
+        }),
+    }).options({ abortEarly: true });
+    return schema.validate(data)
+}
+module.exports = { createUserValidation, loginValidation,postArticalInputValidation}
