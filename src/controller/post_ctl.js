@@ -27,7 +27,7 @@ module.exports = {
                     let response = postArticalInputValidation(req.body);
                     //validation msg display
                     if (response.error) {
-                        return res.status(400).json({message: `${response.error.details[0].message}`});
+                        return res.status(400).json({ message: `${response.error.details[0].message}` });
                     } else {
                         const { name, content } = req.body;
 
@@ -44,19 +44,14 @@ module.exports = {
                         const postImageArr = await req.files.map(item => {
                             return { image: item.filename, postId: postData.id }
                         })
-
-
-                        const postImage = await postImageSchema.bulkCreate(postImageArr
-                            , {
-                                ignoreDuplicates: true,
-                            },
+                        const postImage = await postImageSchema.bulkCreate(
+                            postImageArr,
+                            { ignoreDuplicates: true },
                             { transaction: t }
                         )
 
                         if (postData && postImage) {
-                            res.status(200).json({
-                                message: "Post Create successfully"
-                            })
+                           return  res.status(200).json({ message: "Post Create successfully" })
                         }
                     }
                 }
@@ -65,7 +60,7 @@ module.exports = {
         } catch (error) {
             await t1.rollback();
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Errorgfdgd" })
+            return res.status(500).json({ message: "Internal Server Errorgfdgd" })
         }
     },
     editPostData: async (req, res) => {
@@ -85,38 +80,29 @@ module.exports = {
                     const checkPost = await checkPostExist(postId);
                     //check post is present or not in db
                     if (!checkPost) {
-                        return res.status(400).json({
-                            message: "Post is unavailable.."
-                        });
+                        return res.status(400).json({ message: "Post is unavailable.." });
                     } else {
                         let response = postArticalInputValidation(req.body);
                         //validation msg display
                         if (response.error) {
-                            return res.status(400).json({
-                                message: `${response.error.details[0].message}`
-                            });
+                            return res.status(400).json({ message: `${response.error.details[0].message}` });
                         } else {
                             const { name, content } = req.body;
                             const editPost = await postSchema.update({
                                 name,
                                 content
-                            }, {
-                                where: {
-                                    id: postId
-                                }
-                            }, { transaction: t });
-                            //store post image data
+                            },
+                                { where: { id: postId } },
+                                { transaction: t });
+                            //store post image  in array 
                             const postImageArr = await req.files.map(item => {
                                 return { image: item.filename, postId: postId }
                             });
                             const postImage = await postImageSchema.bulkCreate(postImageArr
-                                , {
-                                    ignoreDuplicates: true,
-                                }, { transaction: t })
+                                , { ignoreDuplicates: true, },
+                                { transaction: t })
                             if (editPost[0] == 1 && postImage) {
-                                res.status(200).json({
-                                    message: "Post Data Update successfully"
-                                })
+                                return res.status(200).json({ message: "Post Data Update successfully" })
                             }
                         }
                     }
@@ -125,7 +111,7 @@ module.exports = {
             });
         } catch (error) {
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Error" })
+            return res.status(500).json({ message: "Internal Server Error" })
         }
     },
     getAllPost: async (req, res) => {
@@ -167,13 +153,10 @@ module.exports = {
                         }
                     ]
                 }, { transaction: t })
-
             if (postData.count == 0) {
-                res.status(400).json({
-                    message: "No Data Available"
-                })
+                return res.status(400).json({message: "No Data Available" })
             } else {
-                res.status(200).json({
+                return res.status(200).json({
                     data: postData.rows,
                     message: "Data get successfully"
                 })
@@ -181,39 +164,32 @@ module.exports = {
             await t.commit();
         } catch (error) {
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Error" })
+            return res.status(500).json({ message: "Internal Server Error" })
         }
     },
     deletePost: async (req, res) => {
         const t = await sequelize.transaction();
         try {
             const postId = req.param('id');
+
             //check login user is a add categary or not
-            
             const data = await checkPostExist(postId);
             if (data) {
-                
-               
-                    let postImage = await postImageSchema.destroy({where: { postId}}, { transaction: t })
-                    let data = await postSchema.destroy({
-                        where: {
-                            id: postId
-                        }
-                    }, { transaction: t });
-                    console.log(postImage)
-                    if (data == 1) {
-                       res.status(200).json({
-                            message: "Post Data Delete successfully"
-                        })
-                    }
-               
+                let postImage = await postImageSchema.destroy({ where: { postId } }, { transaction: t })
+                let data = await postSchema.destroy(
+                    { where: { id: postId } },
+                    { transaction: t });
+
+                if (data == 1) {
+                    return res.status(200).json({ message: "Post Data Delete successfully" })
+                }
             } else {
-                res.status(404).json({ message: "Post Not exists" })
+                return res.status(404).json({ message: "Post Not exists" })
             }
             await t.commit();
         } catch (error) {
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Error" })
+            return res.status(500).json({ message: "Internal Server Error" })
         }
     },
 }

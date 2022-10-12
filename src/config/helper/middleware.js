@@ -3,6 +3,8 @@ require('dotenv').config();
 const { tokenMatch } = require("./helper_func");
 var jwt = require('jsonwebtoken');
 
+
+//for check login user jwt
 const loginCheck = async (req, res, next) => {
     try {
   
@@ -17,13 +19,9 @@ const loginCheck = async (req, res, next) => {
 
           if (err) {
             const message = err.name === 'JsonWebTokenError' ? 'Unauthorized' : err.message;
-            res.status(404).json({
-              message: message
-            });
+            res.status(404).json({message: message});
           } else {
-            console.log(payload.id, token)
             const user = await tokenMatch(payload.id, token);
-         
             if(user)
             next();
             else

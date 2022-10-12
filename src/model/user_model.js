@@ -32,18 +32,7 @@ const userSchema = sequelize.define("user", {
         user.password = bcrypt.hashSync(user.password, salt);
       }
     },
-    // beforeUpdate: async (user) => {
-    //   if (user.password) {
-    //     const salt = await bcrypt.genSaltSync(saltRounds);
-    //     user.password = bcrypt.hashSync(user.password, salt);
-    //   }
-    // }
   },
-  // instanceMethods: {
-  //   validPassword: (password) => {
-  //     return bcrypt.compareSync(password, this.password);
-  //   }
-  // }
   tableName: 'user'
 });
 

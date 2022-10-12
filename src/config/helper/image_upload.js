@@ -3,9 +3,6 @@ const { v4: uuidv4 } = require('uuid');
 
 var storage = multer.diskStorage({
   destination: 'public',
-  // filename: (req, file, cb) => {
-  //   cb(null, file.originalname)
-  // },
   filename: function (req, file, cb) {
     const randomPart = uuidv4(); // use whatever random you want.
     const extension = file.mimetype.split('/')[1];
@@ -27,5 +24,6 @@ var upload = multer({
     }
   }
 });
+//set limit 5 for image or vedio upload
 const uploadmultipleFile = upload.array('files', 5);
 module.exports = { uploadmultipleFile };

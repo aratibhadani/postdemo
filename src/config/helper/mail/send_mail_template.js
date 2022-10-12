@@ -3,8 +3,8 @@ const ejs=require('ejs');
 const {  transporter } = require('./mail_send');
 
 module.exports={
+    //use mail formate for account creation time
     accountCreationTemplate:async(name,email,password)=>{
-        // const templatePath=path.join(__dirname,"../../../../views/accountCrete.ejs");
         const templatePath="/home/mind/practice/articleDemo/postdemo/views/accountCrete.ejs"
         const data=await ejs.renderFile(templatePath,{
             name,email,password
@@ -25,6 +25,8 @@ module.exports={
         });
         
     },
+
+    //use formate for mail send at forget password time
     forgetPasswordLinkSendTemplate:async(email,link)=>{
   
         const templatePath="/home/mind/practice/articleDemo/postdemo/views/linkSendTEmplate.ejs"

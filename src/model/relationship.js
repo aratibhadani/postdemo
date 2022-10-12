@@ -26,4 +26,3 @@ const relationship = () => {
    
 }
 module.exports = relationship;
-// https://javascript.plainenglish.io/password-encryption-using-bcrypt-sequelize-and-nodejs-fb9198634ee7

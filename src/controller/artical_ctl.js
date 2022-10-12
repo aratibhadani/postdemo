@@ -1,4 +1,4 @@
-const { uploadmultipleImage } = require("../config/helper/image_upload");
+const { uploadmultipleFile } = require("../config/helper/image_upload");
 const { postArticalInputValidation } = require("../config/helper/input_validation");
 const multer = require("multer");
 const { returnDecodedToken, checkArticalExist } = require("../config/helper/helper_func");
@@ -13,7 +13,7 @@ module.exports = {
         const t = await sequelize.transaction();
         const t1 = await sequelize.transaction();
         try {
-            uploadmultipleImage(req, res, async function (err) {
+            uploadmultipleFile(req, res, async function (err) {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
@@ -25,9 +25,7 @@ module.exports = {
                     let response = postArticalInputValidation(req.body);
                     //validation msg display
                     if (response.error) {
-                        return res.status(400).json({
-                            message: `${response.error.details[0].message}`
-                        });
+                        return res.status(400).json({message: `${response.error.details[0].message}`});
                     } else {
                         const { name, content } = req.body;
                         console.log(req.files)
@@ -47,16 +45,12 @@ module.exports = {
 
 
                         const articalImage = await articalImageSchema.bulkCreate(articalImageArr
-                            , {
-                                ignoreDuplicates: true,
-                            },
+                            , {ignoreDuplicates: true },
                             { transaction: t }
                         )
 
                         if (articalData && articalImage) {
-                            res.status(200).json({
-                                message: "Artical Create successfully"
-                            })
+                            return  res.status(200).json({ message: "Artical Create successfully" })
                         }
                     }
                 }
@@ -65,16 +59,15 @@ module.exports = {
         } catch (error) {
             await t1.rollback();
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Errorgfdgd" })
+            return res.status(500).json({ message: "Internal Server Errorgfdgd" })
         }
     },
     editArticalData: async (req, res) => {
         const t = await sequelize.transaction();
         try {
-            uploadmultipleImage(req, res, async function (err) {
+            uploadmultipleFile(req, res, async function (err) {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
-                    console.log(err)
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
                         return res.status(400).send({ message: "Too many files to upload." });
                     }
@@ -98,20 +91,17 @@ module.exports = {
                             const editArtical = await articalSchema.update({
                                 name,
                                 content
-                            }, {
-                                where: {
-                                    id: articalId
-                                }
-                            }, { transaction: t });
+                            }, 
+                            {where: { id: articalId}},
+                             { transaction: t });
                             
                             //store artical image data
                         const articalImageArr = await req.files.map(item => {
                             return { image: item.filename, articalId: articalId }
                         })
                             const articalImage = await articalImageSchema.bulkCreate(articalImageArr
-                                , {
-                                    ignoreDuplicates: true,
-                                }, { transaction: t })
+                                , {ignoreDuplicates: true},
+                                 { transaction: t })
                             if (editArtical[0] == 1 && articalImage) {
                                 return res.status(200).json({message: "Artical Data Update successfully"})
                             }
@@ -166,9 +156,7 @@ module.exports = {
                 }, { transaction: t })
 
             if (articalData.count == 0) {
-                res.status(400).json({
-                    message: "No Data Available"
-                })
+                return res.status(400).json({message: "No Data Available"})
             } else {
                 res.status(200).json({
                     data: articalData.rows,
@@ -178,7 +166,7 @@ module.exports = {
             await t.commit();
         } catch (error) {
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Error" })
+            return res.status(500).json({ message: "Internal Server Error" })
         }
     },
     deleteArtical: async (req, res) => {
@@ -189,28 +177,22 @@ module.exports = {
             
             const data = await checkArticalExist(articalId);
             if (data) {
-                
-               
-                    let articalImage = await articalImageSchema.destroy({where: { articalId}}, { transaction: t })
+                let articalImage = await articalImageSchema.destroy({where: { articalId}}, { transaction: t })
                     let data = await articalSchema.destroy({
                         where: {
                             id: articalId
                         }
                     }, { transaction: t });
-                   
-                    if (data == 1) {
-                       res.status(200).json({
-                            message: "Artical Data Delete successfully"
-                        })
+                    if (data == 1 ||articalImage==1) {
+                       return res.status(200).json({message: "Artical Data Delete successfully"})
                     }
-               
             } else {
-                res.status(404).json({ message: "Artical Not exists" })
+                return res.status(404).json({ message: "Artical Not exists" });
             }
             await t.commit();
         } catch (error) {
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Error" })
+            return res.status(500).json({ message: "Internal Server Error" })
         }
     },
 }
