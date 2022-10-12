@@ -19,13 +19,13 @@ var storage = multer.diskStorage({
 var upload = multer({
   storage: storage,
   fileFilter(req, file, cb) {
-    console.log(file)
+  //allow png/jpg/jpeg/ image formate  for vedio allow .mp4 and .MOV formate
     if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "video/quicktime"|| file.mimetype == "video/mp4") {
       cb(null, true);
     } else {
-      return cb(new Error('Invalid file upload type:(png, jpeg ,jpg)'));
+      return cb(new Error('Invalid file upload type:(png, jpeg ,jpg and .MOV ,.mp4)'));
     }
   }
 });
-const uploadmultipleImage = upload.array('files', 5);
-module.exports = { uploadmultipleImage };
+const uploadmultipleFile = upload.array('files', 5);
+module.exports = { uploadmultipleFile };

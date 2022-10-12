@@ -1,4 +1,4 @@
-const { uploadmultipleImage } = require("../config/helper/image_upload");
+const { uploadmultipleFile } = require("../config/helper/image_upload");
 const { postArticalInputValidation } = require("../config/helper/input_validation");
 const multer = require("multer");
 const postSchema = require("../model/post_model");
@@ -9,11 +9,13 @@ const userSchema = require("../model/user_model");
 const { Op } = require("sequelize");
 
 module.exports = {
+
+    //for add post
     addPostData: async (req, res) => {
         const t = await sequelize.transaction();
         const t1 = await sequelize.transaction();
         try {
-            uploadmultipleImage(req, res, async function (err) {
+            uploadmultipleFile(req, res, async function (err) {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
@@ -25,9 +27,7 @@ module.exports = {
                     let response = postArticalInputValidation(req.body);
                     //validation msg display
                     if (response.error) {
-                        res.status(400).json({
-                            message: `${response.error.details[0].message}`
-                        });
+                        return res.status(400).json({message: `${response.error.details[0].message}`});
                     } else {
                         const { name, content } = req.body;
 
@@ -71,7 +71,7 @@ module.exports = {
     editPostData: async (req, res) => {
         const t = await sequelize.transaction();
         try {
-            uploadmultipleImage(req, res, async function (err) {
+            uploadmultipleFile(req, res, async function (err) {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
                     console.log(err)

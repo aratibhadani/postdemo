@@ -9,6 +9,7 @@ const router = require("./src/route/auth_route");
 const postRouter = require('./src/route/post_route');
 
 relationship();
+app.set('view engine', 'ejs');
 
 app.use("/user",router)
 app.use("/post",postRouter)

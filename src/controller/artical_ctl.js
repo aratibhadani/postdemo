@@ -31,17 +31,16 @@ module.exports = {
                     } else {
                         const { name, content } = req.body;
                         console.log(req.files)
-                        const loginUserId = await returnDecodedToken(req);
+                        const loginUser = await returnDecodedToken(req);
                         //store artical data
                         const articalData = await articalSchema.create({
                             name,
                             content,
-                            userId: loginUserId.id
+                            userId: loginUser.id
                         }, { transaction: t1 });
                         await t1.commit(); //1st to commit transaction than after generate new
 
                         //store artical image data
-                       
                         const articalImageArr = await req.files.map(item => {
                             return { image: item.filename, articalId: articalData.id }
                         })
@@ -86,9 +85,7 @@ module.exports = {
                     const checkArtical = await checkArticalExist(articalId);
                     //check artical is present or not in db
                     if (!checkArtical) {
-                        return res.status(400).json({
-                            message: "Artical is unavailable.."
-                        });
+                        return res.status(400).json({ message: "Artical is unavailable.."});
                     } else {
                         let response = postArticalInputValidation(req.body);
                         //validation msg display
@@ -116,9 +113,7 @@ module.exports = {
                                     ignoreDuplicates: true,
                                 }, { transaction: t })
                             if (editArtical[0] == 1 && articalImage) {
-                                res.status(200).json({
-                                    message: "Artical Data Update successfully"
-                                })
+                                return res.status(200).json({message: "Artical Data Update successfully"})
                             }
                         }
                     }
@@ -127,7 +122,7 @@ module.exports = {
             });
         } catch (error) {
             await t.rollback();
-            res.status(500).json({ message: "Internal Server Error" })
+            return res.status(500).json({ message: "Internal Server Error" })
         }
     },
     getAllArtical: async (req, res) => {

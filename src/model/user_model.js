@@ -20,6 +20,9 @@ const userSchema = sequelize.define("user", {
   loginToken: {
     type: Sequelize.STRING(255)
   },
+  forgetToken:{
+    type: Sequelize.STRING(255)
+  }
 }, 
 {
   hooks: {
