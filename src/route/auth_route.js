@@ -1,5 +1,5 @@
 const express=require('express');
-const { userRegistration, getAllUser, listUser, loginUser, logout } = require('../controller/auth_ctl');
+const { userRegistration, listUser, loginUser, logout, changePassword } = require('../controller/auth_ctl');
 var bodyParser = require('body-parser');
 const { loginCheck } = require('../config/helper/middleware');
 
@@ -13,7 +13,7 @@ router.post("/registration",userRegistration);
 router.post("/login", loginUser);
 
 router.get("",loginCheck,listUser);
-
+router.post("/changepwd",loginCheck,changePassword);
 router.get("/logout",loginCheck,logout);
 
 module.exports=router;

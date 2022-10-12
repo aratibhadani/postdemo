@@ -136,6 +136,9 @@ module.exports = {
             res.status(500).json({ message: "Internal Server Error" })
         }
     },
+    changePassword:async(req,res)=>{
+
+    },
     logout: async (req, res) => {
         const t = await sequelize.transaction();
         try {
