@@ -16,6 +16,7 @@ module.exports={
             subject: 'Sending Email for Account create',
             html: data
         };
+        //TODO Add test commit by vikas
         await transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                console.log(error)
