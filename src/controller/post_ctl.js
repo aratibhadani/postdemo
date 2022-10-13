@@ -7,6 +7,7 @@ const postImageSchema = require("../model/postImage_model");
 const sequelize = require("../config/db_conn");
 const userSchema = require("../model/user_model");
 const { Op } = require("sequelize");
+const { BAD_REQUEST_STATUS, SUCCESS_STATUS, INTERNAL_SERVER_STATUS, PAGE_NOT_FOUND_STATUS } = require("../config/helper/enum_data");
 
 module.exports = {
 
@@ -19,15 +20,15 @@ module.exports = {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
-                        return res.status(400).send({ message: "Too many files to upload." });
+                        return res.status(BAD_REQUEST_STATUS).send({ message: "Too many files to upload." });
                     }
                 } else if (err) {
-                    return res.status(400).json({ message: err });
+                    return res.status(BAD_REQUEST_STATUS).json({ message: err });
                 } else {
                     let response = postArticalInputValidation(req.body);
                     //validation msg display
                     if (response.error) {
-                        return res.status(400).json({ message: `${response.error.details[0].message}` });
+                        return res.status(BAD_REQUEST_STATUS).json({ message: `${response.error.details[0].message}` });
                     } else {
                         const { name, content } = req.body;
 
@@ -51,7 +52,7 @@ module.exports = {
                         )
 
                         if (postData && postImage) {
-                           return  res.status(200).json({ message: "Post Create successfully" })
+                           return  res.status(SUCCESS_STATUS).json({ message: "Post Create successfully" })
                         }
                     }
                 }
@@ -60,7 +61,7 @@ module.exports = {
         } catch (error) {
             await t1.rollback();
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Errorgfdgd" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Errorgfdgd" })
         }
     },
     editPostData: async (req, res) => {
@@ -71,21 +72,21 @@ module.exports = {
                 if (err instanceof multer.MulterError) {
                     console.log(err)
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
-                        return res.status(400).send({ message: "Too many files to upload." });
+                        return res.status(BAD_REQUEST_STATUS).send({ message: "Too many files to upload." });
                     }
                 } else if (err) {
-                    return res.status(400).json({ message: err });
+                    return res.status(BAD_REQUEST_STATUS).json({ message: err });
                 } else {
                     const postId = req.param('id');
                     const checkPost = await checkPostExist(postId);
                     //check post is present or not in db
                     if (!checkPost) {
-                        return res.status(400).json({ message: "Post is unavailable.." });
+                        return res.status(BAD_REQUEST_STATUS).json({ message: "Post is unavailable.." });
                     } else {
                         let response = postArticalInputValidation(req.body);
                         //validation msg display
                         if (response.error) {
-                            return res.status(400).json({ message: `${response.error.details[0].message}` });
+                            return res.status(BAD_REQUEST_STATUS).json({ message: `${response.error.details[0].message}` });
                         } else {
                             const { name, content } = req.body;
                             const editPost = await postSchema.update({
@@ -102,7 +103,7 @@ module.exports = {
                                 , { ignoreDuplicates: true, },
                                 { transaction: t })
                             if (editPost[0] == 1 && postImage) {
-                                return res.status(200).json({ message: "Post Data Update successfully" })
+                                return res.status(SUCCESS_STATUS).json({ message: "Post Data Update successfully" })
                             }
                         }
                     }
@@ -111,7 +112,7 @@ module.exports = {
             });
         } catch (error) {
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Error" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Error" })
         }
     },
     getAllPost: async (req, res) => {
@@ -154,9 +155,9 @@ module.exports = {
                     ]
                 }, { transaction: t })
             if (postData.count == 0) {
-                return res.status(400).json({message: "No Data Available" })
+                return res.status(BAD_REQUEST_STATUS).json({message: "No Data Available" })
             } else {
-                return res.status(200).json({
+                 res.status(SUCCESS_STATUS).json({
                     data: postData.rows,
                     message: "Data get successfully"
                 })
@@ -164,7 +165,7 @@ module.exports = {
             await t.commit();
         } catch (error) {
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Error" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Error" })
         }
     },
     deletePost: async (req, res) => {
@@ -181,15 +182,15 @@ module.exports = {
                     { transaction: t });
 
                 if (data == 1) {
-                    return res.status(200).json({ message: "Post Data Delete successfully" })
+                    return res.status(SUCCESS_STATUS).json({ message: "Post Data Delete successfully" })
                 }
             } else {
-                return res.status(404).json({ message: "Post Not exists" })
+                return res.status(PAGE_NOT_FOUND_STATUS).json({ message: "Post Not exists" })
             }
             await t.commit();
         } catch (error) {
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Error" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Error" })
         }
     },
 }

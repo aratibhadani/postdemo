@@ -3,6 +3,7 @@ const { postArticalInputValidation } = require("../config/helper/input_validatio
 const multer = require("multer");
 const { returnDecodedToken, checkArticalExist } = require("../config/helper/helper_func");
 const sequelize = require("../config/db_conn");
+const { resetPasswordLink,  BAD_REQUEST_STATUS, CONFLICT_STATUS, SUCCESS_STATUS, INTERNAL_SERVER_STATUS, UNAUTHORIZED_STATUS, PAGE_NOT_FOUND_STATUS } = require('../config/helper/enum_data');
 const userSchema = require("../model/user_model");
 const { Op } = require("sequelize");
 const articalSchema = require("../model/artical_model");
@@ -17,15 +18,15 @@ module.exports = {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
-                        return res.status(400).send({ message: "Too many files to upload." });
+                        return res.status(BAD_REQUEST_STATUS).send({ message: "Too many files to upload." });
                     }
                 } else if (err) {
-                    return res.status(400).json({ message: err });
+                    return res.status(BAD_REQUEST_STATUS).json({ message: err });
                 } else {
                     let response = postArticalInputValidation(req.body);
                     //validation msg display
                     if (response.error) {
-                        return res.status(400).json({message: `${response.error.details[0].message}`});
+                        return res.status(BAD_REQUEST_STATUS).json({message: `${response.error.details[0].message}`});
                     } else {
                         const { name, content } = req.body;
                         console.log(req.files)
@@ -50,7 +51,7 @@ module.exports = {
                         )
 
                         if (articalData && articalImage) {
-                            return  res.status(200).json({ message: "Artical Create successfully" })
+                            return  res.status(SUCCESS_STATUS).json({ message: "Artical Create successfully" })
                         }
                     }
                 }
@@ -59,7 +60,7 @@ module.exports = {
         } catch (error) {
             await t1.rollback();
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Errorgfdgd" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Errorgfdgd" })
         }
     },
     editArticalData: async (req, res) => {
@@ -69,21 +70,21 @@ module.exports = {
                 //show image not valied
                 if (err instanceof multer.MulterError) {
                     if (err.code === "LIMIT_UNEXPECTED_FILE") {
-                        return res.status(400).send({ message: "Too many files to upload." });
+                        return res.status(BAD_REQUEST_STATUS).send({ message: "Too many files to upload." });
                     }
                 } else if (err) {
-                    return res.status(400).json({ message: err });
+                    return res.status(BAD_REQUEST_STATUS).json({ message: err });
                 } else {
                     const articalId = req.param('id');
                     const checkArtical = await checkArticalExist(articalId);
                     //check artical is present or not in db
                     if (!checkArtical) {
-                        return res.status(400).json({ message: "Artical is unavailable.."});
+                        return res.status(BAD_REQUEST_STATUS).json({ message: "Artical is unavailable.."});
                     } else {
                         let response = postArticalInputValidation(req.body);
                         //validation msg display
                         if (response.error) {
-                            return res.status(400).json({
+                            return res.status(BAD_REQUEST_STATUS).json({
                                 message: `${response.error.details[0].message}`
                             });
                         } else {
@@ -103,7 +104,7 @@ module.exports = {
                                 , {ignoreDuplicates: true},
                                  { transaction: t })
                             if (editArtical[0] == 1 && articalImage) {
-                                return res.status(200).json({message: "Artical Data Update successfully"})
+                                return res.status(SUCCESS_STATUS).json({message: "Artical Data Update successfully"})
                             }
                         }
                     }
@@ -112,7 +113,7 @@ module.exports = {
             });
         } catch (error) {
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Error" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Error" })
         }
     },
     getAllArtical: async (req, res) => {
@@ -156,9 +157,9 @@ module.exports = {
                 }, { transaction: t })
 
             if (articalData.count == 0) {
-                return res.status(400).json({message: "No Data Available"})
+                return res.status(BAD_REQUEST_STATUS).json({message: "No Data Available"})
             } else {
-                res.status(200).json({
+                res.status(SUCCESS_STATUS).json({
                     data: articalData.rows,
                     message: "Data get successfully"
                 })
@@ -166,7 +167,7 @@ module.exports = {
             await t.commit();
         } catch (error) {
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Error" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Error" })
         }
     },
     deleteArtical: async (req, res) => {
@@ -184,15 +185,15 @@ module.exports = {
                         }
                     }, { transaction: t });
                     if (data == 1 ||articalImage==1) {
-                       return res.status(200).json({message: "Artical Data Delete successfully"})
+                       return res.status(SUCCESS_STATUS).json({message: "Artical Data Delete successfully"})
                     }
             } else {
-                return res.status(404).json({ message: "Artical Not exists" });
+                return res.status(PAGE_NOT_FOUND_STATUS).json({ message: "Artical Not exists" });
             }
             await t.commit();
         } catch (error) {
             await t.rollback();
-            return res.status(500).json({ message: "Internal Server Error" })
+            return res.status(INTERNAL_SERVER_STATUS).json({ message: "Internal Server Error" })
         }
     },
 }
