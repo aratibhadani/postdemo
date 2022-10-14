@@ -11,6 +11,7 @@ const {
   postResetPassword,
   editUser,
   deleteUser,
+  sendEmailToUsers,
 } = require('../controller/auth_ctl');
 const { loginCheck } = require('../config/helper/middleware');
 
@@ -33,6 +34,9 @@ router.put('/edituser/:id', loginCheck, editUser);
 router.delete('/deletuser/:id', loginCheck, deleteUser);
 router.get('', loginCheck, listUser);
 router.get('', loginCheck, editUser);
+
+//send all user to mail for offer
+router.get('/sendoffer',loginCheck,sendEmailToUsers);
 
 router.get('/logout', loginCheck, logout);
 

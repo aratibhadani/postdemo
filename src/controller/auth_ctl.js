@@ -20,17 +20,39 @@ const {
   changeForgetPasswordValidation,
   editUserValidation,
 } = require('../config/helper/input_validation');
-const { resetPasswordLink,  BAD_REQUEST_STATUS, CONFLICT_STATUS, SUCCESS_STATUS, INTERNAL_SERVER_STATUS, UNAUTHORIZED_STATUS, PAGE_NOT_FOUND_STATUS } = require('../config/helper/enum_data');
-const accountCreationTemplate = require('../config/helper/mail/send_mail_template');
-const { forgetPasswordLinkSendTemplate } = require('../config/helper/mail/send_mail_template');
+const { resetPasswordLink, BAD_REQUEST_STATUS, CONFLICT_STATUS, SUCCESS_STATUS, INTERNAL_SERVER_STATUS, UNAUTHORIZED_STATUS, PAGE_NOT_FOUND_STATUS } = require('../config/helper/enum_data');
+const { forgetPasswordLinkSendTemplate, accountCreationTemplate } = require('../config/helper/mail/send_mail_template');
 const postSchema = require('../model/post_model');
 const postImageSchema = require('../model/postImage_model');
 const articalSchema = require('../model/artical_model');
 const articalImageSchema = require('../model/articalImage_model');
-
+const { emailQueue } = require('../config/processor');
 const forgetSecret = process.env.JWT_SECRET_FORGETPASSWORD;
 
 module.exports = {
+  //send bulk email using queue job
+  sendEmailToUsers: async (req, res) => {
+    try {
+      const userData = await userSchema.findAll();
+
+      userData.forEach((user, index) => {
+        emailQueue.add(
+          { user },
+          { delay: 4000 }
+        )
+          .then(() => {
+            if (index + 1 === userData.length) {
+              res.json({
+                msg: "all user are added in Queue"
+              })
+            }
+          })
+      })
+
+    } catch (error) {
+      console.log(error);
+    }
+  },
   // user add
   userRegistration: async (req, res) => {
     const t = await sequelize.transaction();
@@ -158,6 +180,8 @@ module.exports = {
           { where: { id: userData.id } },
           { transaction: t },
         );
+        await t.commit();
+
         res.status(SUCCESS_STATUS).json({
           token,
           message: 'login successfully',
@@ -166,7 +190,6 @@ module.exports = {
         return res.status(UNAUTHORIZED_STATUS).json({ message: 'Unauthorized User' });
       }
 
-      await t.commit();
     } catch (error) {
       await t.rollback();
       return res.status(INTERNAL_SERVER_STATUS).json({ message: 'Internal Server Error' });

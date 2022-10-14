@@ -7,7 +7,8 @@ const relationship = require("./src/model/relationship");
 const articalRouter = require('./src/route/artical_route');
 const router = require("./src/route/auth_route");
 const postRouter = require('./src/route/post_route');
-
+//index file require in main.js file
+require('./src/config/processor/index'); //require queue bull processer folder in main.js file
 relationship();
 app.set('view engine', 'ejs');
 

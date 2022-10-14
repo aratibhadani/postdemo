@@ -1,7 +1,10 @@
 const resetPasswordLink = 'http://localhost:3000/user/reset-password';
+const viewTemplateLink='/home/mind/practice/articleDemo/postdemo/views'
 
+module.exports = { 
+  viewTemplateLink, //set path for email template to sending mail
+  resetPasswordLink,
 
-module.exports = { resetPasswordLink,
   SUCCESS_STATUS:200,
   CREATED_STATUS: 201,
   ACCEPTED_STATUS: 202,
