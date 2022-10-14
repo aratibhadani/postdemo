@@ -42,15 +42,13 @@ module.exports = {
         )
           .then(() => {
             if (index + 1 === userData.length) {
-              res.json({
-                msg: "all user are added in Queue"
-              })
+              res.status(SUCCESS_STATUS).json({ msg: "Mail Send to all User...." })
             }
           })
       })
 
     } catch (error) {
-      console.log(error);
+      return res.status(INTERNAL_SERVER_STATUS).json({ message: 'Internal Server Error...' });
     }
   },
   // user add
